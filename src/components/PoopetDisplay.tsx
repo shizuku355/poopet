@@ -1,6 +1,7 @@
 "use client";
 
 import { PoopetCharacter } from '../types';
+import { useEffect, useState } from 'react';
 
 interface PoopetDisplayProps {
   appearance: string;
@@ -21,6 +22,33 @@ const PoopetDisplay = ({
   name,
   language
 }: PoopetDisplayProps) => {
+  // 演出用の状態
+  const [showEvolutionText, setShowEvolutionText] = useState(false);
+  const [showSparkles, setShowSparkles] = useState(false);
+  
+  // 進化演出の制御
+  useEffect(() => {
+    if (isEvolving) {
+      // 進化テキストを表示
+      setShowEvolutionText(true);
+      
+      // キラキラエフェクトを表示
+      setShowSparkles(true);
+      
+      // 一定時間後に演出を終了
+      const timer = setTimeout(() => {
+        setShowEvolutionText(false);
+        setShowSparkles(false);
+      }, 3000);
+      
+      return () => {
+        clearTimeout(timer);
+        setShowEvolutionText(false);
+        setShowSparkles(false);
+      };
+    }
+  }, [isEvolving]);
+  
   // タイプに応じた背景色とサイズ
   const getBgColor = () => {
     if (isDead) return 'bg-gray-200';
@@ -44,13 +72,53 @@ const PoopetDisplay = ({
     return 'w-28 h-28 text-4xl';
   };
   
+  // キラキラエフェクト用の星を生成
+  const renderSparkles = () => {
+    if (!showSparkles) return null;
+    
+    return Array(8).fill(0).map((_, index) => (
+      <div 
+        key={index} 
+        className="absolute evolution-sparkle" 
+        style={{
+          width: '20px',
+          height: '20px',
+          background: 'radial-gradient(circle, #FFD700, transparent)',
+          borderRadius: '50%',
+          top: `${Math.random() * 100}%`,
+          left: `${Math.random() * 100}%`,
+          animationDelay: `${Math.random() * 0.5}s`
+        }}
+      />
+    ));
+  };
+  
   return (
-    <div className="text-center mb-6">
-      <div className="text-6xl mb-2 transition-transform duration-300" style={{
+    <div className="text-center mb-6 relative">
+      {/* 進化テキスト */}
+      {showEvolutionText && (
+        <div className="absolute top-0 left-0 right-0 z-10 evolution-text">
+          {language === 'ja' ? '進化！' : 'Evolution!'}
+        </div>
+      )}
+      
+      <div className={`${getBgColor()} ${getSize()} rounded-full flex items-center justify-center relative ${isEvolving ? 'animate-pulse' : 'poopet-bounce'}`} style={{
         transform: isEvolving ? 'scale(1.2)' : 'scale(1)',
         filter: isEvolving ? 'brightness(1.5)' : 'none'
       }}>
-        <img src={appearance} alt={name} className="w-full h-full object-contain" />
+        {/* キラキラエフェクト */}
+        {renderSparkles()}
+        
+        {/* 進化時の回転アニメーション */}
+        <img 
+          src={appearance} 
+          alt={name} 
+          className={`absolute w-full h-full object-contain ${isEvolving ? 'evolution-rotate' : ''}`} 
+        />
+        
+        {isEvolving && (
+          <div className="absolute inset-0 bg-yellow-400 bg-opacity-30 rounded-full animate-ping"></div>
+        )}
       </div>
       <h2 className="text-xl font-bold text-amber-900 mb-1">
         {name}
