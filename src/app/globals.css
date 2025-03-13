@@ -24,3 +24,7 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.poopet-title {
+  color: #4B2E2A; /* A darker brown color */
+}
