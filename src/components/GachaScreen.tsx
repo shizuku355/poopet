@@ -40,8 +40,8 @@ const GachaScreen = ({ isAnimating, onStartGacha, language }: GachaScreenProps) 
       </div>
       <p className="text-sm text-amber-700">
         {language === 'ja' 
-          ? 'ノーマル (70%), レア (25%), スーパーレア (5%)'
-          : 'Normal (70%), Rare (25%), Super Rare (5%)'}
+          ? 'ノーマル１ (40%), ノーマル２ (40%), レア (20%)'
+          : 'Normal１ (40%), Normal２ (40%), Rare (20%)'}
       </p>
     </div>
   );

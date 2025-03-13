@@ -6,24 +6,24 @@ import { PoopetCharacter, PoopetType, STAMINA_CONFIG } from '../types';
 // 一時的な画像パスの代わりに絵文字を使用
 const POOPET_EMOJIS = {
   normal: {
-    level1: '💩',
-    level10: '💩',
-    level20: '💩',
-    level50: '💩',
+    level1: '/images/ノーマル1.png',
+    level10: '/images/ノーマル1.2.png',
+    level20: '/images/ノーマル1.3.png',
+    level50: '/images/ノーマル1.4.png',
   },
   rare: {
-    level1: '💩',
-    level10: '💩',
-    level20: '💩',
-    level50: '💩',
-    level50Special: '👑💩'
+    level1: '/images/レア1.png',
+    level10: '/images/レア2.png',
+    level20: '/images/レア3.png',
+    level50: '/images/レア4.png',
+    level50Special: '/images/レア3.png'
   },
   superRare: {
-    level1: '💩',
-    level10: '✨💩',
-    level20: '✨💩✨',
-    level50: '🌟💩🌟',
-    level50Special: '👑✨💩✨👑'
+    level1: '/images/ノーマル2.1.png',
+    level10: '/images/ノーマル2.2.png',
+    level20: '/images/ノーマル2.3.png',
+    level50: '/images/ノーマル2.4.png',
+    level50Special: '/images/ノーマル2.3.png'
   }
 };
 
@@ -101,14 +101,16 @@ export const usePoopetGame = () => {
   
   // 新しいポウペットを生成
   const generateNewPoopet = () => {
-    // ガチャの確率設定：ノーマル(70%)、レア(25%)、スーパーレア(5%)
+    // ガチャの確率設定：ノーマル(40%)、ノーマル(40%)、レア(20%)
     const random = Math.random();
     let type: PoopetType = 'normal';
     
-    if (random < 0.05) {
-      type = 'superRare';
-    } else if (random < 0.30) {
-      type = 'rare';
+    if (random < 0.20) {
+        type = 'rare';
+    } else if (random < 0.60) {
+        type = 'normal';
+    } else {
+        type = 'normal';
     }
     
     const now = new Date().toISOString();
@@ -143,6 +145,10 @@ export const usePoopetGame = () => {
     
     setPoopet(newPoopet);
     setIsNameInputOpen(true);  // 名前入力モーダルを表示
+    setGameStarted(true);
+    
+    // LocalStorageに保存
+    localStorage.setItem('poopet', JSON.stringify(newPoopet));
   };
   
   // 名前を設定

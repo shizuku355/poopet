@@ -50,7 +50,7 @@ const PoopetDisplay = ({
         transform: isEvolving ? 'scale(1.2)' : 'scale(1)',
         filter: isEvolving ? 'brightness(1.5)' : 'none'
       }}>
-        {appearance}
+        <img src={appearance} alt={name} className="w-full h-full object-contain" />
       </div>
       <h2 className="text-xl font-bold text-amber-900 mb-1">
         {name}
