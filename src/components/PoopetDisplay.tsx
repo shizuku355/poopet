@@ -1,7 +1,7 @@
 "use client";
 
-import { PoopetCharacter } from '../types';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 interface PoopetDisplayProps {
   appearance: string;
@@ -130,10 +130,12 @@ const PoopetDisplay = ({
         {isMounted && renderSparkles()}
         
         {/* 進化時の回転アニメーション - クライアントサイドでのみ適用 */}
-        <img 
+        <Image 
           src={appearance} 
           alt={name} 
-          className={`absolute w-full h-full object-contain ${isMounted && isEvolving ? 'evolution-rotate' : ''}`} 
+          className={`absolute w-full h-full object-contain ${isMounted && isEvolving ? 'evolution-rotate' : ''}`}
+          width={150}
+          height={150}
         />
         
         {isMounted && isEvolving && (

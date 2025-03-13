@@ -62,6 +62,7 @@ export const usePoopetGame = () => {
     }, 60000); // 1分ごとに更新
     
     return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [poopet]);
   
   // ポウペットの状態をチェック（24時間ケアしなかった場合など）
@@ -208,6 +209,7 @@ export const usePoopetGame = () => {
     }, 60000); // 1分ごとにチェック
     
     return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [poopet]);
 
   // 初期ロード時にもスタミナ回復をチェック
@@ -215,6 +217,7 @@ export const usePoopetGame = () => {
     if (poopet) {
       checkStaminaRecovery();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // アクション実行時のスタミナチェック
@@ -227,6 +230,25 @@ export const usePoopetGame = () => {
 
   // スタミナを消費
   const useStamina = (actionType: keyof typeof STAMINA_CONFIG.ACTION_COSTS) => {
+    if (!poopet) return;
+    
+    const newStamina = Math.max(0, stamina - STAMINA_CONFIG.ACTION_COSTS[actionType]);
+    const now = new Date().toISOString();
+    
+    setStamina(newStamina);
+    setLastStaminaRecovery(now);
+    
+    const newPoopet = {
+      ...poopet,
+      lastActionTime: now
+    };
+    
+    setPoopet(newPoopet);
+    localStorage.setItem('poopet', JSON.stringify(newPoopet));
+  };
+
+  // スタミナを消費する関数（フックではない通常の関数）
+  const consumeStamina = (actionType: keyof typeof STAMINA_CONFIG.ACTION_COSTS) => {
     if (!poopet) return;
     
     const newStamina = Math.max(0, stamina - STAMINA_CONFIG.ACTION_COSTS[actionType]);
@@ -295,7 +317,8 @@ export const usePoopetGame = () => {
     
     if (!poopet || poopet.isDead) return;
     
-    useStamina('feed');
+    // useStaminaではなくconsumeStaminaを使用
+    consumeStamina('feed');
     
     const newHunger = Math.min(100, poopet.stats.hunger + 20);
     const newHappiness = Math.min(100, poopet.stats.happiness + 5);
@@ -328,10 +351,11 @@ export const usePoopetGame = () => {
     
     if (!poopet || poopet.isDead) return;
     
-    useStamina('play');
+    // useStaminaではなくconsumeStaminaを使用
+    consumeStamina('play');
     
     const newHappiness = Math.min(100, poopet.stats.happiness + 20);
-    const newHunger = Math.max(0, poopet.stats.hunger - 5); // 遊ぶとお腹が減る
+    const newHunger = Math.max(0, poopet.stats.hunger - 5);
     
     // 状態更新
     const newPoopet = {
@@ -348,7 +372,7 @@ export const usePoopetGame = () => {
     localStorage.setItem('poopet', JSON.stringify(newPoopet));
     
     // 経験値獲得でレベルアップの可能性
-    const shouldLevelUp = Math.random() > 0.7; // 30%の確率でレベルアップ
+    const shouldLevelUp = Math.random() < 0.1; // 10%の確率でレベルアップ
     if (shouldLevelUp) {
       levelUp();
     }
@@ -360,7 +384,8 @@ export const usePoopetGame = () => {
     
     if (!poopet || poopet.isDead) return;
     
-    useStamina('clean');
+    // useStaminaではなくconsumeStaminaを使用
+    consumeStamina('clean');
     
     const newCleanliness = Math.min(100, poopet.stats.cleanliness + 20);
     
@@ -370,16 +395,15 @@ export const usePoopetGame = () => {
       stats: {
         ...poopet.stats,
         cleanliness: newCleanliness,
-        love: Math.min(100, poopet.stats.love + 1), // 愛情も少し増加
-      },
-      lastCleaned: new Date().toISOString()
+        love: Math.min(100, poopet.stats.love + 1), // 愛情も増加
+      }
     };
     
     setPoopet(newPoopet);
     localStorage.setItem('poopet', JSON.stringify(newPoopet));
     
     // 経験値獲得でレベルアップの可能性
-    const shouldLevelUp = Math.random() > 0.7; // 30%の確率でレベルアップ
+    const shouldLevelUp = Math.random() < 0.05; // 5%の確率でレベルアップ
     if (shouldLevelUp) {
       levelUp();
     }
