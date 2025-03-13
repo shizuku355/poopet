@@ -25,9 +25,17 @@ const PoopetDisplay = ({
   // 演出用の状態
   const [showEvolutionText, setShowEvolutionText] = useState(false);
   const [showSparkles, setShowSparkles] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  
+  // クライアントサイドでのマウント検出
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   
   // 進化演出の制御
   useEffect(() => {
+    if (!isMounted) return;
+    
     if (isEvolving) {
       // 進化テキストを表示
       setShowEvolutionText(true);
@@ -47,7 +55,7 @@ const PoopetDisplay = ({
         setShowSparkles(false);
       };
     }
-  }, [isEvolving]);
+  }, [isEvolving, isMounted]);
   
   // タイプに応じた背景色とサイズ
   const getBgColor = () => {
@@ -76,7 +84,19 @@ const PoopetDisplay = ({
   const renderSparkles = () => {
     if (!showSparkles) return null;
     
-    return Array(8).fill(0).map((_, index) => (
+    // ランダム値をクライアント側でのみ生成するように修正
+    const sparklePositions = [
+      { top: '10%', left: '20%', delay: '0.1s' },
+      { top: '30%', left: '80%', delay: '0.2s' },
+      { top: '50%', left: '10%', delay: '0.3s' },
+      { top: '70%', left: '50%', delay: '0.2s' },
+      { top: '90%', left: '30%', delay: '0.1s' },
+      { top: '20%', left: '60%', delay: '0.3s' },
+      { top: '60%', left: '70%', delay: '0.4s' },
+      { top: '80%', left: '40%', delay: '0.2s' }
+    ];
+    
+    return sparklePositions.map((pos, index) => (
       <div 
         key={index} 
         className="absolute evolution-sparkle" 
@@ -85,9 +105,9 @@ const PoopetDisplay = ({
           height: '20px',
           background: 'radial-gradient(circle, #FFD700, transparent)',
           borderRadius: '50%',
-          top: `${Math.random() * 100}%`,
-          left: `${Math.random() * 100}%`,
-          animationDelay: `${Math.random() * 0.5}s`
+          top: pos.top,
+          left: pos.left,
+          animationDelay: pos.delay
         }}
       />
     ));
@@ -95,28 +115,28 @@ const PoopetDisplay = ({
   
   return (
     <div className="text-center mb-6 relative">
-      {/* 進化テキスト */}
-      {showEvolutionText && (
+      {/* 進化テキスト - クライアントサイドでのみ表示 */}
+      {isMounted && showEvolutionText && (
         <div className="absolute top-0 left-0 right-0 z-10 evolution-text">
           {language === 'ja' ? '進化！' : 'Evolution!'}
         </div>
       )}
       
-      <div className={`${getBgColor()} ${getSize()} rounded-full flex items-center justify-center relative ${isEvolving ? 'animate-pulse' : 'poopet-bounce'}`} style={{
-        transform: isEvolving ? 'scale(1.2)' : 'scale(1)',
-        filter: isEvolving ? 'brightness(1.5)' : 'none'
+      <div className={`${getBgColor()} ${getSize()} rounded-full flex items-center justify-center relative ${isMounted && isEvolving ? 'animate-pulse' : isMounted ? 'poopet-bounce' : ''}`} style={{
+        transform: isMounted && isEvolving ? 'scale(1.2)' : 'scale(1)',
+        filter: isMounted && isEvolving ? 'brightness(1.5)' : 'none'
       }}>
-        {/* キラキラエフェクト */}
-        {renderSparkles()}
+        {/* キラキラエフェクト - クライアントサイドでのみ表示 */}
+        {isMounted && renderSparkles()}
         
-        {/* 進化時の回転アニメーション */}
+        {/* 進化時の回転アニメーション - クライアントサイドでのみ適用 */}
         <img 
           src={appearance} 
           alt={name} 
-          className={`absolute w-full h-full object-contain ${isEvolving ? 'evolution-rotate' : ''}`} 
+          className={`absolute w-full h-full object-contain ${isMounted && isEvolving ? 'evolution-rotate' : ''}`} 
         />
         
-        {isEvolving && (
+        {isMounted && isEvolving && (
           <div className="absolute inset-0 bg-yellow-400 bg-opacity-30 rounded-full animate-ping"></div>
         )}
       </div>
