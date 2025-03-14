@@ -13,7 +13,7 @@ const LanguageSelector = ({ language, onLanguageChange }: LanguageSelectorProps)
   return (
     <div className="mb-4">
       <label htmlFor="language" className="mr-2 font-bold text-amber-900">
-        {language === 'ja' ? '言語:' : 'Language:'}
+        {language === 'ja' ? 'Language:' : 'Language:'}
       </label>
       <select 
         id="language" 
